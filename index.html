@@ -415,6 +415,68 @@ main{padding-block:18px 24px;display:grid;gap:18px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:50;background:var(--ink);color:var(--bg);border-radius:12px;padding:8px 8px 8px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:calc(100% - 32px);font-weight:600}
 .toast button{min-height:48px;padding:0 16px;border-radius:9px;background:var(--hazard);color:var(--hazard-ink);font-weight:700;display:flex;align-items:center;gap:6px}
 @media (prefers-reduced-motion:no-preference){.sheet{animation:up .22s ease-out}@keyframes up{from{transform:translateY(30px);opacity:.6}}}
+
+/* ===== Phone layout: wrap and stack instead of sideways scrolling ===== */
+@media (max-width:640px){
+ main{gap:14px;padding-block:14px 20px}
+ .vhead h2{font-size:1.5rem}
+ .vhead .exportbtn{width:100%}
+ .scroller{flex-wrap:wrap;overflow:visible}
+ .scroller>*{flex:0 1 auto}
+ /* pipeline: total across the top, five stages in one row below */
+ .tiles.pipe{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;overflow:visible;padding:0}
+ .tiles.pipe .pchev{display:none}
+ .tiles.pipe .tile.total{grid-column:1/-1;display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:14px;row-gap:2px;align-items:center;min-height:0;padding:12px 16px}
+ .tiles.pipe .tile.total b{grid-column:1;grid-row:1/span 3;font-size:2.7rem}
+ .tiles.pipe .tile.total .tl-top,.tiles.pipe .tile.total .tl-sub,.tiles.pipe .tile.total .tl-bar{grid-column:2}
+ .tiles.pipe .tile.total .tl-top{font-size:.85rem}
+ .tiles.pipe .tile.total .tl-sub{font-size:.9rem}
+ .tiles.pipe .pstep{min-height:86px;padding:8px 2px;border-radius:12px;gap:2px}
+ .tiles.pipe .pstep b{font-size:1.45rem}
+ .tiles.pipe .pstep .pl{font-size:.66rem;font-weight:800}
+ .tiles.pipe .pstep .pic2 .ic{width:20px;height:20px}
+ /* sites: two columns, all sites across the top */
+ .sitebar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .sitebar .sitebtn:first-child{grid-column:1/-1}
+ .sitebtn{min-height:60px;padding:8px 10px;gap:8px}
+ .sitebtn .sbic{display:none}
+ .sitebtn .sbt{flex:1;min-width:0}
+ .sitebtn .sbt b{white-space:normal;font-size:.92rem;line-height:1.15}
+ .sitebtn .sbt small{font-size:.75rem}
+ .sitesec .crew-h .scroller{width:100%}
+ .cchip{min-height:42px;padding:0 12px;font-size:.84rem}
+ /* technicians: two columns */
+ .crew .scroller,.pickgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .crewcard{min-width:0;padding:8px 10px;gap:8px}
+ .crewcard .av{width:34px;height:34px;font-size:.78rem}
+ .crewcard .who{font-size:.9rem}
+ .crewcard>span:last-child{min-width:0}
+ /* toolbar and job cards */
+ .toolbar .grow{display:none}
+ .toolbar .btn-filter,.toolbar .btn-sort{flex:1 1 0;padding:0 12px;font-size:.98rem}
+ .job-main{padding:12px 14px 10px}
+ .job h3{font-size:1.05rem}
+ .job-foot{flex-wrap:wrap;padding:10px 12px 12px}
+ .job-foot .acts{width:100%;flex-wrap:nowrap}
+ .job-foot .acts .adv,.job-foot .acts .btn{flex:1 1 0;justify-content:center;padding:0 10px}
+ /* documents: access badge under the title */
+ .doc{grid-template-columns:auto minmax(0,1fr);gap:10px;padding:10px 12px}
+ .doc .acc{grid-column:2;justify-self:start}
+ .ftype{width:40px;height:48px}
+ /* landlord */
+ .ll-card{padding:12px 14px}
+ .ll-card .acts{flex-wrap:wrap}
+ .ll-card .acts .btn{flex:1 1 100%}
+ /* planned */
+ .kpi.who{padding:10px;gap:8px}
+ .kpi.who .kic{width:40px;height:40px}
+ .kpi.who b{font-size:1.5rem}
+ .kpi span{font-size:.78rem}
+ .cal-h{padding:10px}
+ .cal-h h3{font-size:1.15rem;min-width:0}
+ .cday{min-height:64px;padding:4px}
+ .cday .d{width:24px;height:24px;font-size:.85rem}
+}
 </style>
 </head>
 <body>
@@ -772,7 +834,7 @@ function vTech(){
  const tk=S.tech, t=TECHS[tk];
  const mine=S.jobs.filter(j=>j.tech===tk).sort((a,b)=>SIDX[a.stage]-SIDX[b.stage]||a.created-b.created);
  const open=mine.filter(j=>j.stage!=="complete"), done=mine.filter(j=>j.stage==="complete");
- const pick=`<div class="scroller">`+Object.entries(TECHS).map(([k,x])=>{
+ const pick=`<div class="scroller pickgrid">`+Object.entries(TECHS).map(([k,x])=>{
   const n=S.jobs.filter(j=>j.tech===k&&j.stage!=="complete").length;
   return `<button class="crewcard" data-act="tech" data-v="${k}" style="${k===tk?"border-color:var(--brand);background:var(--brand-soft)":""}" aria-pressed="${k===tk}">
    <span class="av">${initials(x.name)}</span><span><span class="who">${esc(x.name)}</span><span class="what">${esc(site(x.site).name)} · ${n} open</span></span></button>`}).join("")+`</div>`;
@@ -1091,3 +1153,4 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(placeInd);
 </script>
 </body>
 </html>
+
